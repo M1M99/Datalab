@@ -1,0 +1,181 @@
+{#<h2>Dashboard</h2>#}
+{#<ul>#}
+{#    <li>Total products : {{ kpi.products }}</li>#}
+{#    <li>Total stock : {{ kpi.total_qty }}</li>#}
+{#    <li>Average price : {{ kpi.avg_price }}</li>#}
+{#</ul>#}
+{##}
+{#<h3>Top Categories (Income)</h3>#}
+{#<table border="1" cellpadding="6">#}
+{#    <tr>#}
+{#        <th>#}
+{#            Category#}
+{#        </th>#}
+{#        <th>#}
+{#            Income#}
+{#        </th>#}
+{#        <th>#}
+{#            Product Count#}
+{#        </th>#}
+{#    </tr>#}
+{##}
+{#    {% for c in top_cats %}#}
+{#        <tr>#}
+{#        <td>#}
+{#            {{ c.category }}#}
+{#        </td>#}
+{#        <td>#}
+{#            {{ c.revenue }}#}
+{#        </td>#}
+{#        <td>#}
+{#            {{ c.items }}#}
+{#        </td>#}
+{#        </tr>#}
+{#    {% endfor %}#}
+{##}
+{#</table>#}
+{##}
+{#<p>#}
+{#    <a>Products</a>#}
+{#    <a>Upload</a>#}
+{#    <a>Statistics</a>#}
+{#</p>#}
+{##}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-papZlw3+6+... (kısaltıldı)" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+<style>
+    body {
+        font-family: "Inter", "Segoe UI", sans-serif;
+        background-color: #f5f6fa;
+        margin: 0;
+        padding: 30px;
+        color: #2c3e50;
+    }
+
+    h2, h3, h4 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+        color: #34495e;
+    }
+
+    .kpi-container {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+    }
+
+    .kpi-card {
+        background-color: white;
+        border-radius: 10px;
+        padding: 20px 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        flex: 1 1 200px;
+        min-width: 200px;
+        text-align: center;
+    }
+
+    .kpi-card h4 {
+        color: #7f8c8d;
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+
+    .kpi-card p {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .table-container {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        padding: 25px;
+    }
+
+    .table-header, .table-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        padding: 12px 0;
+        border-bottom: 1px solid #ecf0f1;
+        align-items: center;
+    }
+
+    .table-header {
+        font-weight: 700;
+        color: #34495e;
+        border-bottom: 2px solid #2980b9;
+    }
+
+    .table-row h4 {
+        font-weight: 500;
+        color: #2c3e50;
+    }
+
+    .table-row:hover {
+        background-color: #f8f9fa;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .section-title {
+        margin-bottom: 15px;
+        color: #2980b9;
+        font-size: 1.4rem;
+    }
+
+    .inner-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+</style>
+<body>
+<div style="display: flex;flex-direction: row;align-items: center;justify-content: space-between;margin-bottom: 25px;
+">
+    <h2>Dashboard</h2>
+    <h4><a href={% url "download_template" %}><i style="font-size: 30px" class="fas fa-download"></i></a></h4>
+</div>
+<div class="kpi-container">
+    <div class="kpi-card">
+        <h4>Total Products</h4>
+        <p>{{ kpi.products }}</p>
+    </div>
+    <div class="kpi-card">
+        <h4>Total Stock</h4>
+        <p>{{ kpi.total_qty }}</p>
+    </div>
+    <div class="kpi-card">
+        <h4>Average Price</h4>
+        <p>${{ kpi.avg_price }}</p>
+    </div>
+</div>
+
+<div class="table-container">
+    <div class="inner-container">
+        <h3 class="section-title">Top Categories (Income)</h3>
+        <a href="/products/upload"><i style="font-size: 26px" class="fas fa-upload"></i></a>
+    </div>
+    <div class="table-header">
+        <div>Category</div>
+        <div>Income</div>
+        <div>Products Count</div>
+    </div>
+
+    {% for i in top_cats %}
+        <div class="table-row">
+            <h4>{{ i.category }}</h4>
+            <h4>${{ i.revenue }}</h4>
+            <h4>{{ i.items }}</h4>
+        </div>
+    {% endfor %}
+</div>
+
+</body>
