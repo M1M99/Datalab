@@ -1,0 +1,112 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous" referrerpolicy="no-referrer"/>
+<style>
+    .containerMain, .helperContainer {
+        display: grid;
+        grid-template-columns: 3fr 1fr 1fr 1fr 1fr 1fr;
+        font-size: 20px;
+        font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    .containerMain .title {
+        font-weight: 580;
+    }
+
+    .mainTitle {
+        border-left: 3px solid deepskyblue;
+        padding: 7px;
+        font-size: x-large;
+        font-family: Arial;
+    }
+
+    form p {
+        font-size: x-large;
+        font-family: "Bell MT";
+    }
+
+    form input {
+        padding: 8px 20px;
+        border-radius: 4px;
+    }
+
+    form button {
+        padding: 7px 26px;
+        font-size: 13px;
+        border: 2px solid crimson;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .exportExcel {
+        font-size: 20px;
+        text-decoration: none;
+        color: crimson;
+        font-family: 'Consolas', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+    }
+</style>
+<h2 class="mainTitle">Products</h2>
+<div style="display: flex;flex-direction: column" >
+    <div style="text-align: center">
+        <a href="{% url 'product_upload' %}"><i style="font-size: 25px;margin: 10px" class="fas fa-upload"></i></a>
+        <a href="{% url 'product_export' %}" class="exportExcel"><i class="fas fa-save"
+                                                                    style="font-size: 25px;margin: 10px"></i>Export
+            Excel</a>
+        <i style="margin: 10px;font-size: 25px;color: crimson" class="fa-solid fa-chart-simple"></i><a href="{% url 'stats' %}" style="text-decoration: none;font-size: 23px">Statistics</a>
+    </div>
+    <div style="width: 48%">
+        <form method="get">
+            {{ form.as_p }}
+            <button type="submit">Filter</button>
+        </form>
+    </div>
+</div>
+
+
+<div>
+    <div class="containerMain">
+        <p class="title">SKU</p>
+        <p class="title">Name</p>
+        <p class="title">Category</p>
+        <p class="title">Price</p>
+        <p class="title">Count</p>
+        <p class="title">Date</p>
+    </div>
+    {% for p in qs %}
+        <div class="helperContainer">
+            <p>{{ p.sku }}</p>
+            <p>{{ p.name }}</p>
+            <p>{{ p.category }}</p>
+            <p>{{ p.price }}$</p>
+            <p>{{ p.quantity }}</p>
+            <p>{{ p.tx_date }}</p>
+        </div>
+    {% empty %}
+        <p>No items found</p>
+    {% endfor %}
+</div>
+
+{#<table border="1" cellpadding="6">#}
+{#    <tr>#}
+{#        <th>SKU</th>#}
+{#        <th>Name</th>#}
+{#        <th>Category</th>#}
+{#        <th>Price</th>#}
+{#        <th>Count</th>#}
+{#        <th>Date</th>#}
+{#    </tr>#}
+{##}
+{#    {% for p in qs %}#}
+{#        <tr>#}
+{#            <td>{{ p.sku }}</td>#}
+{#            <td>{{ p.name }}</td>#}
+{#            <td>{{ p.category }}</td>#}
+{#            <td>{{ p.price }}$</td>#}
+{#            <td>{{ p.quantity }}</td>#}
+{#            <td>{{ p.tx_date }}</td>#}
+{#        </tr>#}
+{#    {% empty %}#}
+{#        <tr>#}
+{#            <td colspan="6">No items found</td>#}
+{#        </tr>#}
+{#    {% endfor %}#}
+{#</table>#}
