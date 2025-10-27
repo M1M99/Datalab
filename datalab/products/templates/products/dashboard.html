@@ -43,7 +43,7 @@
 {##}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-      integrity="sha512-papZlw3+6+... (kısaltıldı)" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+       crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
 <style>
     body {
@@ -141,6 +141,7 @@
 <div style="display: flex;flex-direction: row;align-items: center;justify-content: space-between;margin-bottom: 25px;
 ">
     <h2>Dashboard</h2>
+    <h3><a href="{% url 'product_list'%}">Products</a></h3>
     <h4><a href={% url "download_template" %}><i style="font-size: 30px" class="fas fa-download"></i></a></h4>
 </div>
 <div class="kpi-container">
@@ -154,7 +155,7 @@
     </div>
     <div class="kpi-card">
         <h4>Average Price</h4>
-        <p>${{ kpi.avg_price }}</p>
+        <p>${{ kpi.avg_price|floatformat:3 }}</p>
     </div>
 </div>
 

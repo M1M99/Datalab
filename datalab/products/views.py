@@ -1,11 +1,16 @@
 import os
+
+import pandas as pd
+from django.db.models.functions import ExtractQuarter, TruncMonth
+from django.http import FileResponse
 from itertools import zip_longest
+
 
 from django.db.models import Count, Sum, Avg, ExpressionWrapper, F, DecimalField
 from django.shortcuts import render
 
 from . import utils
-from .forms import UploadForm, ProductImageFormSet
+from .forms import UploadForm, ProductImageFormSet, DateFilterForm
 from .models import Product
 
 from django.conf import settings
@@ -80,6 +85,74 @@ def product_upload(request):
 
     return render(request, "products/upload.html", ctx)
 
+
+def product_list(request):
+    form = DateFilterForm(request.GET or None)
+    qs = Product.objects.all().order_by('-tx_date', '-id')
+
+    if form.is_valid():
+        df = form.cleaned_data.get("date_form")
+        dt = form.cleaned_data.get("date_to")
+        cat = form.cleaned_data.get("category")
+        if df:
+            qs = qs.filter(tx_date__gte=df)
+        if dt:
+            qs = qs.filter(tx_date__lte=dt)
+        if cat:
+            qs = qs.filter(category__icontains=cat)
+
+    return render(request, "products/product_list.html", {"form": form, "qs": qs})
+
+
+def product_export(request):
+    qs = Product.objects.all().order_by('-tx_date', 'sku')
+    data = qs.values(
+        "sku",
+        "name",
+        "price",
+        "quantity",
+        'category', 'tx_date', )
+    df = pd.DataFrame.from_records(data)
+    path = utils.df_to_excel_response(df,'product_export.xlsx')
+    return FileResponse(open(path, 'rb'),as_attachment=True,filename=os.path.basename(path))
+
+def stats_view(request):
+    revenue_expr = ExpressionWrapper(F("price") * F("quantity"),
+                                     output_field=DecimalField(max_digits=14, decimal_places=2))
+
+    monthly = (Product.objects
+               .annotate(month=TruncMonth("tx_date"))
+               .values("month")
+               .annotate(revenue=Sum(revenue_expr), items=Count("id"))
+               )
+
+    quarterly = (Product.objects
+                 .annotate(q=ExtractQuarter("tx_date"))
+                 .values("q")
+                 .annotate(revenue=Sum(revenue_expr), avg_price=Avg("price"))
+                 .order_by("q"))
+
+    by_cat = (Product.objects
+              .values("category")
+              .annotate(mean_price=Avg("price"), total_qty=Sum("quantity"))
+              .order_by("-total_qty"))
+
+    top_sku = (Product.objects
+    .values("sku", "name", "category")
+    .annotate(revenue=Sum(revenue_expr), qty=Sum("quantity"))
+    .order_by("-revenue")[:10])
+
+    low_stock = Product.objects.filter(quantity__lte=5).order_by("quantity", "name")[:10]
+
+    ctx = {
+        'monthly': list(monthly.values('month', 'revenue', 'items')),
+        'quarterly': list(quarterly.values('q', 'revenue', 'avg_price')),
+        'by_cat': list(by_cat.values('category', 'mean_price', 'total_qty')),
+        'top_sku': list(top_sku.values('sku', 'name', 'category', 'revenue', 'qty')),
+        'low_stock': list(low_stock.values('sku', 'name', 'quantity')),
+    }
+
+    return render(request, "products/products_stats.html", ctx)
 
 def download_template(request):
     return utils.download_template()
